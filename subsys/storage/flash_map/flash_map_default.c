@@ -10,10 +10,48 @@
 #include <zephyr.h>
 #include <storage/flash_map.h>
 
-#define FLASH_AREA_FOO(part)						\
-	{.fa_id = DT_FIXED_PARTITION_ID(part),				\
-	 .fa_off = DT_REG_ADDR(part),					\
-	 .fa_dev_name = DT_LABEL(DT_MTD_FROM_FIXED_PARTITION(part)),	\
+#if USE_PARTITION_MANAGER
+
+/**
+ * Have flash_map_default use Partition Manager information instead of
+ * DeviceTree information when we are using the Partition Manager.
+ */
+
+#include <pm_config.h>
+#include <sys/util.h>
+
+#define FLASH_MAP_OFFSET(i) UTIL_CAT(PM_, UTIL_CAT(PM_##i##_LABEL, _ADDRESS))
+#define FLASH_MAP_DEV(i)    UTIL_CAT(PM_, UTIL_CAT(PM_##i##_LABEL, _DEV_NAME))
+#define FLASH_MAP_SIZE(i)   UTIL_CAT(PM_, UTIL_CAT(PM_##i##_LABEL, _SIZE))
+#define FLASH_MAP_NUM       PM_NUM
+
+#define FLASH_AREA_FOO(i, _)                \
+	{                                       \
+		.fa_id       = i,                   \
+		.fa_off      = FLASH_MAP_OFFSET(i), \
+		.fa_dev_name = FLASH_MAP_DEV(i),    \
+		.fa_size     = FLASH_MAP_SIZE(i)    \
+	},
+
+const struct flash_area default_flash_map[] = {
+	UTIL_LISTIFY(FLASH_MAP_NUM, FLASH_AREA_FOO, ~)
+};
+
+#else
+
+/* Get the grand parent of a node */
+#define GPARENT(node_id) DT_PARENT(DT_PARENT(node_id))
+
+/* return great-grandparent label if 'soc-nv-flash' else grandparent label */
+#define DT_FLASH_DEV_FROM_PARTITION(part)				      \
+	DT_LABEL(COND_CODE_1(DT_NODE_HAS_COMPAT(GPARENT(part), soc_nv_flash), \
+			     (DT_PARENT(GPARENT(part))),		      \
+			     (GPARENT(part))))
+
+#define FLASH_AREA_FOO(part)					\
+	{.fa_id = DT_FIXED_PARTITION_ID(part),			\
+	 .fa_off = DT_REG_ADDR(part),				\
+	 .fa_dev_name = DT_FLASH_DEV_FROM_PARTITION(part),	\
 	 .fa_size = DT_REG_SIZE(part),},
 
 #define FOREACH_PARTITION(n) DT_FOREACH_CHILD(DT_DRV_INST(n), FLASH_AREA_FOO)
@@ -25,6 +63,8 @@
 const struct flash_area default_flash_map[] = {
 	DT_INST_FOREACH_STATUS_OKAY(FOREACH_PARTITION)
 };
+
+#endif /* USE_PARTITION_MANAGER */
 
 const int flash_map_entries = ARRAY_SIZE(default_flash_map);
 const struct flash_area *flash_map = default_flash_map;
