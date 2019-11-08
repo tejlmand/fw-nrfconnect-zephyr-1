@@ -35,12 +35,4 @@ if(CONFIG_ARM_FIRMWARE_HAS_SECURE_ENTRY_FUNCS)
     ${ZEPHYR_FINAL_EXECUTABLE})
 endif()
 
-if (CONFIG_ARM_FIRMWARE_USES_SECURE_ENTRY_FUNCS)
-  # Link the entry veneers library file with the Non-Secure Firmware that needs it.
-  zephyr_link_libraries(${veneers_lib_path})
-
-  # Add dependency for the benefit of make.
-  add_dependencies(${IMAGE}zephyr_interface nsc_veneers)
-endif()
-
 zephyr_sources_ifdef(CONFIG_ARM_SECURE_FIRMWARE arm_core_tz.c)
