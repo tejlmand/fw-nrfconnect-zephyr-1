@@ -1542,7 +1542,7 @@ function(add_partition_manager_config config_file)
   get_filename_component(pm_path ${config_file} REALPATH)
   set_property(
     GLOBAL APPEND PROPERTY
-    ${BOARD}_${IMAGE}PM_SUBSYS #TODO I don't think this will work
+    PM_SUBSYS
     ${pm_path}
     )
 endfunction()

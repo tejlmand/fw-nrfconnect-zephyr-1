@@ -17,8 +17,11 @@ foreach(report ram_report rom_report)
     )
 endforeach()
 
-
-get_domain(${BOARD} domain)
+# TODO get rid of this
+list(REMOVE_DUPLICATES PM_DOMAINS)
+foreach(domain ${PM_DOMAINS})
+  list(APPEND yml_files ${CMAKE_BINARY_DIR}/partitions_${domain}.yml)
+endforeach()
 
 add_custom_command(
   TARGET rom_report
@@ -26,6 +29,6 @@ add_custom_command(
   COMMAND
   ${PYTHON_EXECUTABLE}
   ${ZEPHYR_BASE}/../nrf/scripts/partition_manager_report.py
-  --input ${CMAKE_BINARY_DIR}/partitions_${domain}.yml
+  --input ${yml_files}
   "$<$<NOT:$<TARGET_EXISTS:partition_manager>>:--quiet>"
   )
