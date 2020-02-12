@@ -23,7 +23,7 @@ endif()
 add_executable(testbinary ${SOURCES})
 
 set(KOBJ_TYPES_H_TARGET kobj_types_h_target)
-include($ENV{ZEPHYR_BASE}/cmake/kobj.cmake)
+include(${ZEPHYR_BASE}/cmake/kobj.cmake)
 add_dependencies(testbinary ${KOBJ_TYPES_H_TARGET})
 gen_kobj(KOBJ_GEN_DIR)
 
@@ -72,14 +72,14 @@ if(LIBS)
 endif()
 
 target_sources(testbinary PRIVATE
-  $ENV{ZEPHYR_BASE}/subsys/testsuite/ztest/src/ztest.c
-  $ENV{ZEPHYR_BASE}/subsys/testsuite/ztest/src/ztest_mock.c
+  ${ZEPHYR_BASE}/subsys/testsuite/ztest/src/ztest.c
+  ${ZEPHYR_BASE}/subsys/testsuite/ztest/src/ztest_mock.c
   )
 
 target_compile_definitions(testbinary PRIVATE ZTEST_UNITTEST)
 
 foreach(inc ${INCLUDE})
-  target_include_directories(testbinary PRIVATE $ENV{ZEPHYR_BASE}/${inc})
+  target_include_directories(testbinary PRIVATE ${ZEPHYR_BASE}/${inc})
 endforeach()
 
 find_program(VALGRIND_PROGRAM valgrind)

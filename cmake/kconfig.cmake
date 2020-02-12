@@ -199,6 +199,7 @@ endif()
 
 execute_process(
   COMMAND
+  ${CMAKE_COMMAND} -E env ZEPHYR_BASE=${ZEPHYR_BASE}
   ${PYTHON_EXECUTABLE}
   ${ZEPHYR_BASE}/scripts/kconfig/kconfig.py
   ${input_configs_are_handwritten}

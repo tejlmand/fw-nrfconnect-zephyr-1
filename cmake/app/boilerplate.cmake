@@ -4,7 +4,7 @@
 # Zephyr applications, e.g. zephyr/samples/hello_world/CMakeLists.txt
 # must start with the line:
 #
-# include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
+# include(${ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
 #
 # It exists to reduce boilerplate code that Zephyr expects to be in
 # application CMakeLists.txt code.
@@ -74,11 +74,9 @@ add_custom_target(code_data_relocation_target)
 # when trying to reference ENV${ZEPHYR_BASE}.
 
 # Note any later project() resets PROJECT_SOURCE_DIR
-file(TO_CMAKE_PATH "$ENV{ZEPHYR_BASE}" PROJECT_SOURCE_DIR)
+file(TO_CMAKE_PATH "${ZEPHYR_BASE}" PROJECT_SOURCE_DIR)
 
 set(ZEPHYR_BINARY_DIR ${PROJECT_BINARY_DIR})
-set(ZEPHYR_BASE ${PROJECT_SOURCE_DIR})
-set(ENV{ZEPHYR_BASE}   ${ZEPHYR_BASE})
 
 set(AUTOCONF_H ${__build_dir}/include/generated/autoconf.h)
 # Re-configure (Re-execute all CMakeLists.txt code) when autoconf.h changes

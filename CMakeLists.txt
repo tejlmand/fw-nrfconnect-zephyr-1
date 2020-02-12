@@ -623,7 +623,7 @@ add_custom_command(
   )
 add_custom_target(${DRIVER_VALIDATION_H_TARGET} DEPENDS ${DRV_VALIDATION})
 
-include($ENV{ZEPHYR_BASE}/cmake/kobj.cmake)
+include(${ZEPHYR_BASE}/cmake/kobj.cmake)
 gen_kobj(KOBJ_INCLUDE_PATH)
 
 # Add a pseudo-target that is up-to-date when all generated headers
@@ -774,8 +774,8 @@ endif()
 # Warning most of this gperf code is duplicated below for
 # gen_kobject_list.py / output_lib
 if(CONFIG_ARM AND CONFIG_USERSPACE)
-  set(GEN_PRIV_STACKS $ENV{ZEPHYR_BASE}/scripts/gen_priv_stacks.py)
-  set(PROCESS_PRIV_STACKS_GPERF $ENV{ZEPHYR_BASE}/scripts/process_gperf.py)
+  set(GEN_PRIV_STACKS ${ZEPHYR_BASE}/scripts/gen_priv_stacks.py)
+  set(PROCESS_PRIV_STACKS_GPERF ${ZEPHYR_BASE}/scripts/process_gperf.py)
 
   set(PRIV_STACKS                    priv_stacks_hash.gperf)
   set(PRIV_STACKS_OUTPUT_SRC_PRE     priv_stacks_hash_preprocessed.c)
