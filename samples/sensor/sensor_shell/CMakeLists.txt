@@ -9,7 +9,7 @@ macro(set_conf_file)
   endif()
 endmacro()
 
-include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
+find_package(Zephyr 2.2.0 HINTS $ENV{ZEPHYR_BASE})
 project(sensor_shell)
 
 FILE(GLOB app_sources src/*.c)

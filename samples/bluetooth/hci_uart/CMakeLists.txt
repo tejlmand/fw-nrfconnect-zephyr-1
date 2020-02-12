@@ -9,7 +9,7 @@ else()
   set(CONF_FILE nrf5.conf)
 endif()
 
-include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
+find_package(Zephyr 2.2.0 HINTS $ENV{ZEPHYR_BASE})
 project(hci_uart)
 
 target_sources(app PRIVATE src/main.c)

@@ -14,7 +14,7 @@ if((BOARD STREQUAL nrf52840_pca10056) OR
   endif()
 endif()
 
-include($ENV{ZEPHYR_BASE}/cmake/app/boilerplate.cmake NO_POLICY_SCOPE)
+find_package(Zephyr 2.2.0 HINTS $ENV{ZEPHYR_BASE})
 project(fs_shell)
 
 
