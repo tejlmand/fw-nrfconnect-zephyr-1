@@ -364,6 +364,7 @@
 /scripts/west-commands.yml                @mbolivar
 /scripts/zephyr_module.py                 @tejlmand
 /scripts/valgrind.supp                    @aescolar
+/share/zephyr-package/                    @tejlmand
 /subsys/bluetooth/                        @joerchan @jhedberg @Vudentz
 /subsys/bluetooth/controller/             @carlescufi @cvinayak @thoh-ot
 /subsys/bluetooth/mesh/                   @jhedberg @trond-snekvik @joerchan @Vudentz
