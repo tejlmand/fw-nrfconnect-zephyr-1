@@ -54,7 +54,9 @@ else()
   set(PROJECT_VERSION ${PROJECT_VERSION_WITHOUT_TWEAK})
 endif()
 
-message(STATUS "Zephyr version: ${PROJECT_VERSION}")
+if (NOT NO_PRINT_VERSION)
+  message(STATUS "Zephyr version: ${PROJECT_VERSION}")
+endif()
 
 set(MAJOR ${PROJECT_VERSION_MAJOR}) # Temporary convenience variable
 set(MINOR ${PROJECT_VERSION_MINOR}) # Temporary convenience variable
