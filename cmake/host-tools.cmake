@@ -43,6 +43,7 @@ else()
       COMMAND ${WEST}  topdir
       OUTPUT_VARIABLE  WEST_TOPDIR
       OUTPUT_STRIP_TRAILING_WHITESPACE
+      WORKING_DIRECTORY ${ZEPHYR_BASE}
       )
   endif()
 endif()
