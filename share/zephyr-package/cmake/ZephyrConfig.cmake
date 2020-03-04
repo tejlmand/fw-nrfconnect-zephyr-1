@@ -20,15 +20,18 @@ macro(include_boilerplate location)
   endif()
 endmacro()
 
-set(ZEPHYR_BASE $ENV{ZEPHYR_BASE})
-
-if (ZEPHYR_BASE)
+if((NOT DEFINED CACHE{ZEPHYR_BASE}) AND (DEFINED ENV{ZEPHYR_BASE}))
   # Get rid of any double folder string before comparison, as example, user provides
   # ZEPHYR_BASE=//path/to//zephyr_base/
   # must also work.
-  get_filename_component(ZEPHYR_BASE ${ZEPHYR_BASE} ABSOLUTE)
-
+  get_filename_component(ZEPHYR_BASE $ENV{ZEPHYR_BASE} ABSOLUTE)
+  set(ZEPHYR_BASE ${ZEPHYR_BASE} CACHE PATH "Zephyr base")
   include_boilerplate("zephyr base")
+  return()
+endif()
+
+if (DEFINED CACHE{ZEPHYR_BASE})
+  include_boilerplate("zephyr base (cached)")
   return()
 endif()
 
@@ -45,7 +48,7 @@ string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "${CURRENT_ZEPHYR_DIR}/" COMMON_INDEX)
 if (COMMON_INDEX EQUAL 0)
   # Project is in-zephyr-tree.
   # We are in Zephyr tree.
-  set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR})
+  set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR} CACHE PATH "Zephyr base")
   include_boilerplate("in-zephyr-tree")
   return()
 endif()
@@ -53,7 +56,7 @@ endif()
 if(IS_INCLUDED)
   # A higher level did the checking and included us and as we are not in-zephyr-tree (checked above)
   # then we must be in work-tree.
-  set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR})
+  set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR} CACHE PATH "Zephyr base")
   include_boilerplate("in-work-tree")
 endif()
 
@@ -67,7 +70,7 @@ if(NOT IS_INCLUDED)
     check_zephyr_package(PROJECT_WORKTREE_DIR ${PROJECT_WORKTREE_DIR})
 
     # We are the best candidate, so let's include boiler plate.
-    set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR})
+    set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR} CACHE PATH "Zephyr base")
     include_boilerplate("in-work-tree")
     return()
   endif()
@@ -78,6 +81,6 @@ if(NOT IS_INCLUDED)
   # Thus, the app is build oot.
   # CMake find_package has already done the version checking, so let's just include boiler plate.
   # Previous find_package would have cleared Zephyr_FOUND variable, thus set it again.
-  set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR})
+  set(ZEPHYR_BASE ${CURRENT_ZEPHYR_DIR} CACHE PATH "Zephyr base")
   include_boilerplate("out-of-worktree")
 endif()

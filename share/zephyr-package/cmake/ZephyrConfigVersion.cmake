@@ -27,22 +27,23 @@ macro(check_zephyr_version)
   endif()
 endmacro()
 
-# First check to see if user has provided a Zephyr base manually.
-set(ZEPHYR_BASE $ENV{ZEPHYR_BASE})
+# First check to see if user has provided a Zephyr base manually and it is first run (cache not set).
+if((NOT DEFINED CACHE{ZEPHYR_BASE}) AND (DEFINED ENV{ZEPHYR_BASE}))
+  # Get rid of any double folder string before comparison, as example, user provides
+  # ZEPHYR_BASE=//path/to//zephyr_base/
+  # must also work.
+  get_filename_component(ZEPHYR_BASE $ENV{ZEPHYR_BASE} ABSOLUTE)
+endif()
 
 # If ZEPHYR_CANDIDATE is set, it means this file was include instead of called via find_package directly.
 if(ZEPHYR_CANDIDATE)
   set(IS_INCLUDED TRUE)
 endif()
 
-if (ZEPHYR_BASE)
-  # ZEPHYR_BASE was set in environment, meaning the package version must be ignored and the Zephyr
-  # pointed to by ZEPHYR_BASE is to be used regardless of version
-
-  # Get rid of any double folder string before comparison, as example, user provides
-  # ZEPHYR_BASE=//path/to//zephyr_base/
-  # must also work.
-  get_filename_component(ZEPHYR_BASE ${ZEPHYR_BASE} ABSOLUTE)
+if((DEFINED CACHE{ZEPHYR_BASE}) OR (DEFINED ENV{ZEPHYR_BASE}))
+  # ZEPHYR_BASE was set in cache from earlier run or in environment (first run),
+  # meaning the package version must be ignored and the Zephyr pointed to by
+  # ZEPHYR_BASE is to be used regardless of version.
   if (${ZEPHYR_BASE}/share/zephyr-package/cmake STREQUAL ${CMAKE_CURRENT_LIST_DIR})
     # We are the Zephyr to be used
     set(PACKAGE_VERSION_COMPATIBLE TRUE)
