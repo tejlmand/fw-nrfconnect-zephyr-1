@@ -9,5 +9,6 @@
 
 void main(void)
 {
+//	test_call(myInt);
 	printk("Hello World! %s\n", CONFIG_BOARD);
 }
