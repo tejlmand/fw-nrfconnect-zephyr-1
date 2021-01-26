@@ -93,3 +93,5 @@ else()
     )
 
 endif()
+
+list(REMOVE_DUPLICATES ZEPHYR_MODULE_NAMES)
