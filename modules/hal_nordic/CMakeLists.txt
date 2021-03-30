@@ -4,7 +4,7 @@
 if (CONFIG_NRF_802154_RADIO_DRIVER OR CONFIG_NRF_802154_SERIALIZATION)
 
 zephyr_library_named(nrf-802154-platform)
-zephyr_interface_library_named(nrf-802154-interface)
+zephyr_interface_library_named(zephyr-802154-interface)
 
 if (CONFIG_NRF_802154_RADIO_DRIVER)
   target_sources(nrf-802154-platform
@@ -41,7 +41,7 @@ if (CONFIG_NRF_802154_SER_RADIO)
     )
 endif ()
 
-target_compile_definitions(nrf-802154-interface
+target_compile_definitions(zephyr-802154-interface
   INTERFACE
     # Radio driver shim layer uses raw api
     NRF_802154_USE_RAW_API=1
@@ -71,19 +71,19 @@ target_compile_definitions(nrf-802154-interface
 )
 
 if (CONFIG_NRF_802154_CCA_MODE_ED)
-  target_compile_definitions(nrf-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_ED)
+  target_compile_definitions(zephyr-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_ED)
 elseif (CONFIG_NRF_802154_CCA_MODE_CARRIER)
-  target_compile_definitions(nrf-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_CARRIER)
+  target_compile_definitions(zephyr-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_CARRIER)
 elseif (CONFIG_NRF_802154_CCA_MODE_CARRIER_AND_ED)
-  target_compile_definitions(nrf-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_CARRIER_AND_ED)
+  target_compile_definitions(zephyr-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_CARRIER_AND_ED)
 elseif (CONFIG_NRF_802154_CCA_MODE_CARRIER_OR_ED)
-  target_compile_definitions(nrf-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_CARRIER_OR_ED)
+  target_compile_definitions(zephyr-802154-interface INTERFACE NRF_802154_CCA_MODE_DEFAULT=NRF_RADIO_CCA_MODE_CARRIER_OR_ED)
 endif()
 
 if (NOT CONFIG_IEEE802154_NRF5 AND NOT CONFIG_IEEE802154_NRF5_EXT_IRQ_MGMT)
-  target_compile_definitions(nrf-802154-interface INTERFACE NRF_802154_INTERNAL_RADIO_IRQ_HANDLING=1)
+  target_compile_definitions(zephyr-802154-interface INTERFACE NRF_802154_INTERNAL_RADIO_IRQ_HANDLING=1)
 else()
-  target_compile_definitions(nrf-802154-interface INTERFACE NRF_802154_INTERNAL_RADIO_IRQ_HANDLING=0)
+  target_compile_definitions(zephyr-802154-interface INTERFACE NRF_802154_INTERNAL_RADIO_IRQ_HANDLING=0)
 endif()
 
 set(NRF52_SERIES  ${CONFIG_SOC_SERIES_NRF52X})
@@ -91,9 +91,13 @@ set(NRF53_SERIES  ${CONFIG_SOC_SERIES_NRF53X})
 set(SER_HOST      ${CONFIG_NRF_802154_SER_HOST})
 set(SL_OPENSOURCE ${CONFIG_NRF_802154_SL_OPENSOURCE})
 
-add_subdirectory_ifdef(CONFIG_NRF_802154_SOURCE_HAL_NORDIC ${ZEPHYR_CURRENT_MODULE_DIR}/drivers/nrf_802154 nrf_802154)
+if(CONFIG_NRF_802154_SOURCE_HAL_NORDIC)
+  add_subdirectory(${ZEPHYR_CURRENT_MODULE_DIR}/drivers/nrf_802154 nrf_802154)
 
-target_link_libraries(zephyr_interface INTERFACE nrf-802154-interface)
+  target_link_libraries(nrf-802154-interface INTERFACE zephyr-802154-interface)
+  target_link_libraries(zephyr_interface INTERFACE nrf-802154-interface)
+endif()
+
 
 if (CONFIG_NRF_802154_RADIO_DRIVER)
   zephyr_append_cmake_library(nrf-802154-driver)
