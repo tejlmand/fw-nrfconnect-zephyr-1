@@ -20,6 +20,7 @@ maintained in modules in addition to what is available in the main Zephyr tree.
 import argparse
 import os
 import re
+import subprocess
 import sys
 import yaml
 import pykwalify.core
@@ -245,8 +246,70 @@ def process_twister(module, meta):
     return out
 
 
+def process_meta(zephyr_base, projects, modules):
+    # Process zephyr_base, projects, and modules and create a dictionary
+    # with meta information for each input.
+    #
+    # The dictionary will contain meta info in the following lists:
+    # - zephyr:        path and revision
+    # - modules:       name, path, and revision
+    # - west-projects: path and revision
+    #
+    # returns the dictionary with said lists
+
+    meta = {"zephyr": [], "modules": [], "west-projects": []}
+
+    def git_revision(path):
+        rc = subprocess.Popen(['git', 'rev-parse', '--is-inside-work-tree'],
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              cwd=path).wait()
+        if rc == 0:
+            # A git repo.
+            popen = subprocess.Popen(['git', 'rev-parse', 'HEAD'],
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE,
+                                     cwd=path)
+            stdout, stderr = popen.communicate()
+            stdout = stdout.decode("utf-8")
+
+            if not (popen.returncode or stderr):
+                revision = stdout.rstrip()
+
+                rc = subprocess.Popen(['git', 'diff-index', '--quiet', 'HEAD',
+                                       '--'],
+                                      stdout=None,
+                                      stderr=None,
+                                      cwd=path).wait()
+                if rc:
+                    return revision + '-dirty'
+                return revision
+        return None
+
+    meta_project = {"path": zephyr_base,
+                    "revision": git_revision(zephyr_base)}
+    meta["zephyr"].append(meta_project)
+
+    for module in modules:
+        module_path = PurePath(module.project).as_posix()
+        meta_project = {"name": module.meta['name'],
+                        "path": module_path,
+                        "revision": git_revision(module_path)}
+        meta["modules"].append(meta_project)
+
+    for project in projects:
+        project_path = PurePath(project).as_posix()
+        meta_project = {"path": project_path,
+                        "revision": git_revision(project_path)}
+        meta["west-projects"].append(meta_project)
+
+    return meta
+
+
 def parse_modules(zephyr_base, modules=None, extra_modules=None):
+    projects = []
     if modules is None:
+        modules = []
         # West is imported here, as it is optional
         # (and thus maybe not installed)
         # if user is providing a specific modules list.
@@ -265,14 +328,10 @@ def parse_modules(zephyr_base, modules=None, extra_modules=None):
             # Only accept WestNotFound, meaning we are not in a west
             # workspace. Such setup is allowed, as west may be installed
             # but the project is not required to use west.
-            projects = []
-    else:
-        projects = modules.copy()
+            pass
 
     if extra_modules is None:
         extra_modules = []
-
-    projects += extra_modules
 
     Module = namedtuple('Module', ['project', 'meta', 'depends'])
     # dep_modules is a list of all modules that has an unresolved dependency
@@ -282,7 +341,7 @@ def parse_modules(zephyr_base, modules=None, extra_modules=None):
     # sorted_modules is a topological sorted list of the modules
     sorted_modules = []
 
-    for project in projects:
+    for project in projects + modules + extra_modules:
         # Avoid including Zephyr base project as module.
         if project == zephyr_base:
             continue
@@ -323,7 +382,7 @@ def parse_modules(zephyr_base, modules=None, extra_modules=None):
             error += f'{module.project} depends on: {module.depends}\n'
         sys.exit(error)
 
-    return sorted_modules
+    return (projects, sorted_modules)
 
 
 def main():
@@ -340,6 +399,11 @@ def main():
     parser.add_argument('--cmake-out',
                         help="""File to write with resulting <name>:<path>
                              values to use for including in CMake""")
+    parser.add_argument('--meta-out',
+                        help="""Write a build meta YaML file containing a list
+                             of Zephyr modules and west projects.
+                             If a module or project is also a git repository
+                             the current SHA revision will also be written.""")
     parser.add_argument('--settings-out',
                         help="""File to write with resulting <name>:<value>
                              values to use for including in CMake""")
@@ -357,7 +421,8 @@ def main():
     settings = ""
     twister = ""
 
-    modules = parse_modules(args.zephyr_base, args.modules, args.extra_modules)
+    projects, modules = parse_modules(args.zephyr_base, args.modules,
+                                      args.extra_modules)
 
     for module in modules:
         kconfig += process_kconfig(module.project, module.meta)
@@ -380,6 +445,11 @@ def main():
     if args.twister_out:
         with open(args.twister_out, 'w', encoding="utf-8") as fp:
             fp.write(twister)
+
+    if args.meta_out:
+        meta = process_meta(args.zephyr_base, projects, modules)
+        with open(args.meta_out, 'w', encoding="utf-8") as fp:
+            fp.write(yaml.dump(meta))
 
 
 if __name__ == "__main__":
