@@ -499,13 +499,18 @@ GROUP_END(DTCM)
 	KEEP(*(.gnu.attributes))
 	}
 
-/* Must be last in romable region */
-SECTION_PROLOGUE(.last_section,(NOLOAD),)
+/*
+ * Must be last in romable region
+ * The section is filled with a word of E015 == end of last section to ensure
+ * location counter and actual romregion data usage match.
+ */
+SECTION_PROLOGUE(.last_section,,)
 {
+  LONG(0xE015E015)
 } GROUP_LINK_IN(ROMABLE_REGION)
 
 /* To provide the image size as a const expression,
  * calculate this value here. */
-_flash_used = LOADADDR(.last_section) - __rom_region_start;
+_flash_used = LOADADDR(.last_section) + SIZEOF(.last_section) - __rom_region_start;
 
     }
