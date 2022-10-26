@@ -34,3 +34,4 @@ config WARN_DEPRECATED
 	  features are enabled.
 
 rsource "bootloader/Kconfig"
+rsource "radio/Kconfig"

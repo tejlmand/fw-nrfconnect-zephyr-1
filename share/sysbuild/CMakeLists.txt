@@ -65,6 +65,7 @@ list(APPEND IMAGES "${app_name}")
 set(DEFAULT_IMAGE "${app_name}")
 
 add_subdirectory(bootloader)
+add_subdirectory(radio)
 
 # This allows for board and app specific images to be included.
 include(${BOARD_DIR}/sysbuild.cmake OPTIONAL)
