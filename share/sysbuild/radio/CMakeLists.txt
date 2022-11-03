@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Include MCUboot if enabled.
+# Include hci_rpmsg if enabled.
 if(SB_CONFIG_RADIO_HCI_RPMSG)
   ExternalZephyrProject_Add(
     APPLICATION ${SB_CONFIG_RADIO_HCI_RPMSG_NAME}
@@ -27,4 +27,19 @@ if(SB_CONFIG_RADIO_HCI_RPMSG)
   if(SB_CONFIG_RADIO_HCI_RPMSG_DOMAIN_APP)
     set(DOMAIN_APP_${SB_CONFIG_RADIO_HCI_RPMSG_DOMAIN} "${SB_CONFIG_RADIO_HCI_RPMSG_NAME}" PARENT_SCOPE)
   endif()
+endif()
+
+# Include b0n if enabled.
+if(SB_CONFIG_RADIO_BOOTLOADER_B0N)
+  ExternalZephyrProject_Add(
+    APPLICATION b0n
+    SOURCE_DIR ${ZEPHYR_NRF_MODULE_DIR}/samples/nrf5340/netboot
+SYSBUILD_MODULE_DIRS ${SYSBUILD_MODULE_DIRS}
+SYSBUILD_CMAKE_DIRS ${SYSBUILD_CMAKE_DIRS}
+BOARD nrf5340dk_nrf5340_cpunet
+  )
+  # MCUBoot default configuration is to perform a full chip erase.
+  # Placing MCUBoot first in list to ensure it is flashed before other images.
+  set(OTHER_CORE_IMAGES "b0n" ${OTHER_CORE_IMAGES} PARENT_SCOPE)
+  set(OTHER_CORE_BOARD_NAME "nrf5340dk_nrf5340_cpunet" PARENT_SCOPE)
 endif()

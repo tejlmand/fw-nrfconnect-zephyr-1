@@ -50,3 +50,29 @@ config RADIO_HCI_RPMSG_DOMAIN
 config RADIO_HCI_RPMSG_DOMAIN_APP
 	bool
 	default y if RADIO_HCI_RPMSG_BOARD = "nrf5340dk_nrf5340_cpunet"
+
+config SUPPORT_RADIO_BOOTLOADER
+	bool
+	default y
+
+config SUPPORT_RADIO_BOOTLOADER_B0N
+	bool
+	default y
+
+choice RADIO_BOOTLOADER
+	prompt "Radio-core bootloader support"
+	default RADIO_BOOTLOADER_NONE
+	depends on SUPPORT_RADIO_BOOTLOADER
+
+config RADIO_BOOTLOADER_NONE
+	bool "None"
+	help
+	  Do not Include a radio bootloader image in the build
+
+config RADIO_BOOTLOADER_B0N
+	bool "hci_rpmsg"
+	depends on SUPPORT_RADIO_BOOTLOADER_B0N
+	help
+	  Include b0n as the radio bootloader image to use
+
+endchoice
