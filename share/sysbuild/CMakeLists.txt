@@ -87,4 +87,12 @@ endwhile()
 foreach(image ${IMAGES})
   ExternalZephyrProject_Cmake(APPLICATION ${image})
 endforeach()
+
+# Temp implementation - start
+# Run partition manager for each image before running CMake.
+
+include(${ZEPHYR_NRF_MODULE_DIR}/cmake/extensions.cmake)
+include(${ZEPHYR_NRF_MODULE_DIR}/cmake/sysbuild/partition_manager.cmake OPTIONAL)
+
+# Temp implementation - end
 include(cmake/domains.cmake)
