@@ -42,3 +42,7 @@ config RADIO_HCI_RPMSG_BOARD
 	help
 	  Remote board when building this sample.
 	  If not set, the board given to sysbuild is used.
+
+config RADIO_HCI_RPMSG_DOMAIN_APP
+	bool
+	default y if RADIO_HCI_RPMSG_BOARD = "nrf5340dk_nrf5340_cpunet"

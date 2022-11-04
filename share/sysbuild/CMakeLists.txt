@@ -92,6 +92,12 @@ endforeach()
 # Temp implementation - start
 # Run partition manager for each image before running CMake.
 
+if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
+  # When using board nrf5340dk_nrf5340_cpuapp, then the board: nrf5340dk_nrf5340_cpunet
+  # belongs to the CPUNET domain.
+  set(nrf5340dk_nrf5340_cpunet_DOMAIN CPUNET)
+endif()
+
 include(${ZEPHYR_NRF_MODULE_DIR}/cmake/extensions.cmake)
 include(${ZEPHYR_NRF_MODULE_DIR}/cmake/sysbuild/partition_manager.cmake OPTIONAL)
 
