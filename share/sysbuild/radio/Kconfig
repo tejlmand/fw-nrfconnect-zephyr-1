@@ -27,3 +27,10 @@ config RADIO_HCI_RPMSG
 	  Include hci_rpmsg as the radio image to use
 
 endchoice
+
+config RADIO_HCI_RPMSG_BOARD
+	string
+	depends on RADIO_HCI_RPMSG
+	help
+	  Remote board when building this sample.
+	  If not set, the board given to sysbuild is used.
