@@ -37,6 +37,7 @@ config RADIO_HCI_RPMSG_NAME
 
 config RADIO_HCI_RPMSG_BOARD
 	string
+	default "nrf5340dk_nrf5340_cpunet" if $(BOARD) = "nrf5340dk_nrf5340_cpuapp"
 	depends on RADIO_HCI_RPMSG
 	help
 	  Remote board when building this sample.
