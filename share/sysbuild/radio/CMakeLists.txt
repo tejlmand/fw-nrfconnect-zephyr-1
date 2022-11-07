@@ -5,11 +5,11 @@
 # Include MCUboot if enabled.
 if(SB_CONFIG_RADIO_HCI_RPMSG)
   ExternalZephyrProject_Add(
-    APPLICATION hci_rpmsg
+    APPLICATION ${SB_CONFIG_RADIO_HCI_RPMSG_NAME}
     SOURCE_DIR ${ZEPHYR_BASE}/samples/bluetooth/hci_rpmsg
     BOARD ${SB_CONFIG_RADIO_HCI_RPMSG_BOARD}
   )
   # MCUBoot default configuration is to perform a full chip erase.
   # Placing MCUBoot first in list to ensure it is flashed before other images.
-  set(IMAGES ${IMAGES} "hci_rpmsg" PARENT_SCOPE)
+  set(IMAGES ${IMAGES} "${SB_CONFIG_RADIO_HCI_RPMSG_NAME}" PARENT_SCOPE)
 endif()

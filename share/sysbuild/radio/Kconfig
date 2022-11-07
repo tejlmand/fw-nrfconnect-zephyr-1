@@ -28,6 +28,13 @@ config RADIO_HCI_RPMSG
 
 endchoice
 
+config RADIO_HCI_RPMSG_NAME
+	string
+	default "hci_rpmsg"
+	depends on RADIO_HCI_RPMSG
+	help
+	  Image name of radio hci rpmsg.
+
 config RADIO_HCI_RPMSG_BOARD
 	string
 	depends on RADIO_HCI_RPMSG
