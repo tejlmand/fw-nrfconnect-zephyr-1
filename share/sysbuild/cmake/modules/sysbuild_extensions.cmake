@@ -176,34 +176,6 @@ function(ExternalZephyrProject_Add)
 
   set(sysbuild_cache_file ${CMAKE_BINARY_DIR}/${ZBUILD_APPLICATION}_sysbuild_cache.txt)
 
-  get_cmake_property(sysbuild_cache CACHE_VARIABLES)
-  foreach(var_name ${sysbuild_cache})
-    if(NOT "${var_name}" MATCHES "^CMAKE_.*")
-      # We don't want to pass internal CMake variables.
-      # Required CMake variable to be passed, like CMAKE_BUILD_TYPE must be
-      # passed using `-D` on command invocation.
-      get_property(var_type CACHE ${var_name} PROPERTY TYPE)
-      set(cache_entry "${var_name}:${var_type}=${${var_name}}")
-      string(REPLACE ";" "\;" cache_entry "${cache_entry}")
-      list(APPEND sysbuild_cache_strings "${cache_entry}\n")
-    endif()
-  endforeach()
-  list(APPEND sysbuild_cache_strings "SYSBUILD_NAME:STRING=${ZBUILD_APPLICATION}\n")
-
-  if(ZBUILD_MAIN_APP)
-    list(APPEND sysbuild_cache_strings "SYSBUILD_MAIN_APP:BOOL=True\n")
-  endif()
-
-  if(DEFINED ZBUILD_BOARD)
-    # Only set image specific board if provided.
-    # The sysbuild BOARD is exported through sysbuild cache, and will be used
-    # unless <image>_BOARD is defined.
-    list(APPEND sysbuild_cache_strings "${ZBUILD_APPLICATION}_BOARD:STRING=${ZBUILD_BOARD}\n")
-  endif()
-
-  file(WRITE ${sysbuild_cache_file}.tmp ${sysbuild_cache_strings})
-  zephyr_file_copy(${sysbuild_cache_file}.tmp ${sysbuild_cache_file} ONLY_IF_DIFFERENT)
-
   set(shared_cmake_vars_argument)
   foreach(shared_var ${shared_cmake_variables_list})
     if(DEFINED CACHE{${ZBUILD_APPLICATION}_${shared_var}})
@@ -250,6 +222,14 @@ function(ExternalZephyrProject_Add)
     BUILD_ALWAYS True
     USES_TERMINAL_BUILD True
   )
+  set_target_properties(${ZBUILD_APPLICATION} PROPERTIES CACHE_FILE ${sysbuild_cache_file})
+  if(ZBUILD_MAIN_APP)
+    set_target_properties(${ZBUILD_APPLICATION} PROPERTIES MAIN_APP True)
+  endif()
+
+  if(DEFINED ZBUILD_BOARD)
+    set_target_properties(${ZBUILD_APPLICATION} PROPERTIES BOARD ${ZBUILD_BOARD})
+  endif()
 endfunction()
 
 # Usage:
@@ -293,6 +273,41 @@ function(ExternalZephyrProject_Cmake)
   )
 
   ExternalProject_Get_Property(${ZCMAKE_APPLICATION} SOURCE_DIR BINARY_DIR CMAKE_ARGS)
+  get_target_property(${ZCMAKE_APPLICATION}_CACHE_FILE ${ZCMAKE_APPLICATION} CACHE_FILE)
+  get_target_property(${ZCMAKE_APPLICATION}_BOARD      ${ZCMAKE_APPLICATION} BOARD)
+  get_target_property(${ZCMAKE_APPLICATION}_MAIN_APP   ${ZCMAKE_APPLICATION} MAIN_APP)
+
+  get_cmake_property(sysbuild_cache CACHE_VARIABLES)
+  foreach(var_name ${sysbuild_cache})
+    if(NOT "${var_name}" MATCHES "^CMAKE_.*")
+      # We don't want to pass internal CMake variables.
+      # Required CMake variable to be passed, like CMAKE_BUILD_TYPE must be
+      # passed using `-D` on command invocation.
+      get_property(var_type CACHE ${var_name} PROPERTY TYPE)
+      set(cache_entry "${var_name}:${var_type}=${${var_name}}")
+      string(REPLACE ";" "\;" cache_entry "${cache_entry}")
+      list(APPEND sysbuild_cache_strings "${cache_entry}\n")
+    endif()
+  endforeach()
+  list(APPEND sysbuild_cache_strings "SYSBUILD_NAME:STRING=${ZCMAKE_APPLICATION}\n")
+
+  if(${ZCMAKE_APPLICATION}_MAIN_APP)
+    list(APPEND sysbuild_cache_strings "SYSBUILD_MAIN_APP:BOOL=True\n")
+  endif()
+
+  if(${ZCMAKE_APPLICATION}_BOARD)
+    # Only set image specific board if provided.
+    # The sysbuild BOARD is exported through sysbuild cache, and will be used
+    # unless <image>_BOARD is defined.
+    list(APPEND sysbuild_cache_strings
+         "${ZCMAKE_APPLICATION}_BOARD:STRING=${${ZCMAKE_APPLICATION}_BOARD}\n"
+    )
+  endif()
+
+  file(WRITE ${${ZCMAKE_APPLICATION}_CACHE_FILE}.tmp ${sysbuild_cache_strings})
+  zephyr_file_copy(${${ZCMAKE_APPLICATION}_CACHE_FILE}.tmp
+                   ${${ZCMAKE_APPLICATION}_CACHE_FILE} ONLY_IF_DIFFERENT
+  )
 
   execute_process(
     COMMAND ${CMAKE_COMMAND}
