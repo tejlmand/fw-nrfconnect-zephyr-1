@@ -112,19 +112,22 @@ include(${ZEPHYR_NRF_MODULE_DIR}/cmake/fw_zip.cmake)
 
 set(FW_BIN_FILES)
 set(FW_LOAD_OFFSETS)
+set(FW_VERSIONS)
 set(FW_FILE_NAMES)
 foreach(image ${IMAGES})
   set(IMAGE_FW_BIN_FILE)
+  set(IMAGE_FW_VERSION)
   set(IMAGE_FW_LOAD_OFFSET)
   sysbuild_get(IMAGE_FW_BIN_FILE IMAGE ${image} VAR PM_ZIP_FW_BIN_FILE CACHE)
+  sysbuild_get(IMAGE_FW_VERSION IMAGE ${image} VAR PM_ZIP_FW_VERSION CACHE)
   sysbuild_get(IMAGE_FW_LOAD_OFFSET IMAGE ${image} VAR PM_ZIP_FW_LOAD_OFFSET CACHE)
   list(APPEND FW_BIN_FILES ${IMAGE_FW_BIN_FILE})
+  list(APPEND FW_VERSIONS ${IMAGE_FW_VERSION})
   list(APPEND FW_LOAD_OFFSETS ${IMAGE_FW_LOAD_OFFSET})
   list(APPEND FW_FILE_NAMES ${image}.bin)
-
-#Version needed
 endforeach()
 
+#Version needed
 generate_dfu_zip(
   OUTPUT ${PROJECT_BINARY_DIR}/dfu_application.zip
   BIN_FILES ${FW_BIN_FILES}
