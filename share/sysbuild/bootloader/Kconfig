@@ -65,3 +65,15 @@ config BOOT_SIGNATURE_KEY_FILE
 	  Absolute path to key file to use with MCUBoot.
 
 endif
+
+# Temp implementation - start
+# Provide secure boot option in sysbuild
+config SECURE_BOOT
+	bool "Use Secure Bootloader"
+	default y if $(BOARD) = "nrf5340dk_nrf5340_cpuapp"
+	depends on BOOTLOADER_MCUBOOT
+	help
+	  Set this option to enable the first stage bootloader which
+	  verifies the signature of the app.
+
+# Temp implementation - end
