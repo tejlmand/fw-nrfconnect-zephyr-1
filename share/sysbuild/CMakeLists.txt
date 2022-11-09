@@ -107,3 +107,29 @@ include(${ZEPHYR_NRF_MODULE_DIR}/cmake/sysbuild/partition_manager.cmake OPTIONAL
 
 # Temp implementation - end
 include(cmake/domains.cmake)
+
+include(${ZEPHYR_NRF_MODULE_DIR}/cmake/fw_zip.cmake)
+
+set(FW_BIN_FILES)
+set(FW_LOAD_OFFSETS)
+set(FW_FILE_NAMES)
+foreach(image ${IMAGES})
+  set(IMAGE_FW_BIN_FILE)
+  set(IMAGE_FW_LOAD_OFFSET)
+  sysbuild_get(IMAGE_FW_BIN_FILE IMAGE ${image} VAR PM_ZIP_FW_BIN_FILE CACHE)
+  sysbuild_get(IMAGE_FW_LOAD_OFFSET IMAGE ${image} VAR PM_ZIP_FW_LOAD_OFFSET CACHE)
+  list(APPEND FW_BIN_FILES ${IMAGE_FW_BIN_FILE})
+  list(APPEND FW_LOAD_OFFSETS ${IMAGE_FW_LOAD_OFFSET})
+  list(APPEND FW_FILE_NAMES ${image}.bin)
+
+#Version needed
+endforeach()
+
+generate_dfu_zip(
+  OUTPUT ${PROJECT_BINARY_DIR}/dfu_application.zip
+  BIN_FILES ${FW_BIN_FILES}
+  FILE_NAMES ${FW_FILE_NAMES}
+  TYPE application
+  SCRIPT_PARAMS ""
+  )
+#      SCRIPT_PARAMS ${generate_script_params}
