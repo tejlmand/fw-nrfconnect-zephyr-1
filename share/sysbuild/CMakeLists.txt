@@ -114,6 +114,7 @@ set(FW_BIN_FILES)
 set(FW_LOAD_OFFSETS)
 set(FW_VERSIONS)
 set(FW_FILE_NAMES)
+set(FW_DEPENDENCIES)
 foreach(image ${IMAGES})
   set(IMAGE_FW_BIN_FILE)
   set(IMAGE_FW_VERSION)
@@ -121,10 +122,13 @@ foreach(image ${IMAGES})
   sysbuild_get(IMAGE_FW_BIN_FILE IMAGE ${image} VAR PM_ZIP_FW_BIN_FILE CACHE)
   sysbuild_get(IMAGE_FW_VERSION IMAGE ${image} VAR PM_ZIP_FW_VERSION CACHE)
   sysbuild_get(IMAGE_FW_LOAD_OFFSET IMAGE ${image} VAR PM_ZIP_FW_LOAD_OFFSET CACHE)
+if(IMAGE_FW_BIN_FILE)
   list(APPEND FW_BIN_FILES ${IMAGE_FW_BIN_FILE})
   list(APPEND FW_VERSIONS ${IMAGE_FW_VERSION})
   list(APPEND FW_LOAD_OFFSETS ${IMAGE_FW_LOAD_OFFSET})
   list(APPEND FW_FILE_NAMES ${image}.bin)
+  list(APPEND FW_DEPENDENCIES ${image})
+endif()
 endforeach()
 
 #Version needed
@@ -134,5 +138,6 @@ generate_dfu_zip(
   FILE_NAMES ${FW_FILE_NAMES}
   TYPE application
   SCRIPT_PARAMS ""
+  IMAGES ${FW_DEPENDENCIES}
   )
 #      SCRIPT_PARAMS ${generate_script_params}
