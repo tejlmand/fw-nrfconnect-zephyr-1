@@ -46,6 +46,14 @@ macro(add_overlay_dts image overlay_file)
   add_overlay(${image} ${overlay_file} DTC_OVERLAY_FILE)
 endmacro()
 
+if(SB_CONFIG_BOOTLOADER_MCUBOOT)
+  add_overlay_config(
+    mcuboot
+     ${ZEPHYR_NRF_MODULE_DIR}/subsys/partition_manager/ext_flash_mcuboot_secondary.conf
+  )
+endif()
+
+
 if(SB_CONFIG_SECURE_BOOT)
   add_overlay_config(
     ${SB_CONFIG_RADIO_HCI_RPMSG_NAME} # ToDo: Create a common Kconfig setting
