@@ -18,6 +18,9 @@ endfunction()
 
 function(zephyr_mcuboot_tasks)
   set(keyfile "${CONFIG_MCUBOOT_SIGNATURE_KEY_FILE}")
+  if("${keyfile}" STREQUAL "")
+    set(keyfile "${CONFIG_BOOT_SIGNATURE_KEY_FILE}")
+  endif()
   set(keyfile_enc "${CONFIG_MCUBOOT_ENCRYPTION_KEY_FILE}")
 
   if(NOT "${CONFIG_MCUBOOT_GENERATE_UNSIGNED_IMAGE}")
@@ -28,6 +31,10 @@ function(zephyr_mcuboot_tasks)
       return()
     endif()
   endif()
+
+if (${CONFIG_MCUBOOT})
+return()
+endif()
 
   if(NOT WEST)
     # This feature requires west.

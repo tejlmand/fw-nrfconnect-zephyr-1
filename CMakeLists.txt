@@ -1698,7 +1698,7 @@ if(CONFIG_BUILD_OUTPUT_INFO_HEADER)
 endif()
 
 # Generate and use MCUboot related artifacts as needed.
-if(CONFIG_BOOTLOADER_MCUBOOT)
+if((CONFIG_BOOTLOADER_MCUBOOT) OR (CONFIG_SIGN_IMAGES))
   include(${CMAKE_CURRENT_LIST_DIR}/cmake/mcuboot.cmake)
 endif()
 
