@@ -102,11 +102,11 @@ elseif(EXISTS          ${APPLICATION_CONFIG_DIR}/app.overlay)
   set(DTC_OVERLAY_FILE ${APPLICATION_CONFIG_DIR}/app.overlay)
 endif()
 
-set(DTC_OVERLAY_FILE ${DTC_OVERLAY_FILE} CACHE STRING "If desired, you can \
-build the application using the DT configuration settings specified in an \
-alternate .overlay file using this parameter. These settings will override the \
-settings in the board's .dts file. Multiple files may be listed, e.g. \
-DTC_OVERLAY_FILE=\"dts1.overlay dts2.overlay\"")
+#set(DTC_OVERLAY_FILE ${DTC_OVERLAY_FILE} CACHE STRING "If desired, you can \
+#build the application using the DT configuration settings specified in an \
+#alternate .overlay file using this parameter. These settings will override the \
+#settings in the board's .dts file. Multiple files may be listed, e.g. \
+#DTC_OVERLAY_FILE=\"dts1.overlay dts2.overlay\"")
 
 # The DTC_OVERLAY_FILE variable is now set to its final value.
 zephyr_boilerplate_watch(DTC_OVERLAY_FILE)
