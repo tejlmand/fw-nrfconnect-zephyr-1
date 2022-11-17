@@ -27,7 +27,7 @@
 #define RAMABLE_REGION SRAM
 #endif
 
-#if USE_PARTITION_MANAGER
+#ifdef USE_PARTITION_MANAGER
 
 #include <pm_config.h>
 
