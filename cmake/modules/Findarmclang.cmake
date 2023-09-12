@@ -14,11 +14,12 @@
 
 if(CMAKE_C_COMPILER)
   # Parse the 'clang --version' output to find the installed version.
-  execute_process(COMMAND ${CMAKE_C_COMPILER} --target=${triple} --version OUTPUT_VARIABLE ARMCLANG_VERSION)
-  string(REGEX REPLACE "[^0-9]*([0-9.]+) .*" "\\1" ARMCLANG_VERSION ${ARMCLANG_VERSION})
+  execute_process(COMMAND ${CMAKE_C_COMPILER} --target=${triple} --version OUTPUT_VARIABLE ARMCLANG_VERSION ERROR_QUIET)
+  string(REGEX REPLACE "[^0-9]*([0-9.]+).*" "\\1" ARMCLANG_VERSION ${ARMCLANG_VERSION})
 endif()
-
+message("--- ${triple}")
+message("--- ${ARMCLANG_VERSION}")
 find_package_handle_standard_args(armclang
 				  REQUIRED_VARS CMAKE_C_COMPILER
-				  VERSION_VAR ARMCLANG_VERSION
+#				  VERSION_VAR ARMCLANG_VERSION
 )
